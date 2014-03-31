@@ -15,7 +15,7 @@
     (try
       (let [s (read-line)] ;; считать данные из переопределенного *in*
         (if (= (str/lower-case s) "quit")
-          (deliver should-be-finished :true) ;;; 1) сообщить основному потоку что мы завершаем выполнение.
+          (future (deliver should-be-finished :true)) ;;; 1) сообщить основному потоку что мы завершаем выполнение.
 ;;; для этого необходимо установить переменную should-be-finished в true
           (prn (perform-query s)) ;;; 2) выполнить запрос при помощи perform-query и записать
 ;;; результат в переопределенный *out*
@@ -30,12 +30,12 @@
   (try
     (let [^Socket sock (.accept server-sock)]
       (println "Starting new thread...")
-      (.start (Thread. (handle-request sock))) ;; выполнить функцию handle-request в отдельном потоке
+      (future (.start (Thread. (handle-request sock)))) ;; выполнить функцию handle-request в отдельном потоке
       )
     (catch SocketTimeoutException ex)
     (catch Throwable ex
       (println "Got exception" ex)
-      (deliver should-be-finished :true) ;; сообщить основному потоку что мы завершаем выполнение
+      (future (deliver should-be-finished :true)) ;; сообщить основному потоку что мы завершаем выполнение
                                         ;; для этого необходимо установить переменную should-be-finished в true
       )))
 
