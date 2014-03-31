@@ -18,5 +18,5 @@
   (load-initial-data))
 
 (defn -Select [^String query]
-  (perform-query query))
+  (str (seq (vec (perform-query query)))))
 
