@@ -121,17 +121,6 @@
             addition-dates-replacer
             compare-dates-replacer) code)))
 
- ;; (defmacro with-datetime [& code]
- ;;   `(do ~@(postwalk
- ;;           addition-dates-replacer code)))
-
- ;; (defmacro with-datetime [& code]
- ;;   `(do ~@(postwalk addition-dates-replacer code)))
-
-;; (defmacro with-datetime [& code]
-;;    `(do ~@(prewalk-demo code)))
-
-
 (macroexpand-1 '(with-datetime (> today yesterday)))
 
 (macroexpand-1 '(with-datetime (tomorrow + 1 week)))
