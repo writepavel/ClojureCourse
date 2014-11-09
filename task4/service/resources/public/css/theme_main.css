@@ -369,6 +369,7 @@ body > section {
   transition: opacity ease-in-out 500ms;
   z-index: 1;
 }
+
 #main-slider .prev,
 #main-slider .next {
   position: absolute;
@@ -396,6 +397,41 @@ body > section {
 #main-slider .next {
   right: 10px;
 }
+
+/*---------------------------------------------------------------*/
+/*  Это настройки слайдера который появляется во время вопросов  */
+/*---------------------------------------------------------------*/
+
+#main-slider .question-nav.prev,
+#main-slider .question-nav.next {
+  position: fixed;
+  top: 50%;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #fff;
+  display: inline-block;
+  margin-top: -25px;
+  font-size: 24px;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 4px;
+  z-index: 5;
+}
+#main-slider .question-nav.prev:hover,
+#main-slider .question-nav.next:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+#main-slider .question-nav.prev {
+  left: 10px;
+}
+#main-slider .question-nav.next {
+  right: 10px;
+}
+
+/*---------------------------------------------------------------*/
+
 #main-slider .active .animation.animated-item-1 {
   -webkit-animation: fadeInUp 300ms linear 300ms both;
   -moz-animation: fadeInUp 300ms linear 300ms both;

@@ -81,7 +81,7 @@
 ;; "node-like" - forms node https://github.com/Prismatic/dommy/blob/master/src/dommy/template.cljs#L71
 
 (defn note-div-array [content]
-  (let [simple_node (node [:br])]  ;; create blank node
+  (let [simple_node (node [:br " "])]  ;; create blank node
     (dommy/set-html! simple_node content) ;; fill new node by content
     (sel simple_node :div) ;; create vector of div nodes
    ;; (str "__SELECT_NOTE_DIV type of DD is " (type divs ) ",  selection is " divs " Is it array? " (array? divs) )

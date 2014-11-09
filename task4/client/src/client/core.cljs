@@ -46,10 +46,10 @@
 
 (em/defsnippet site-slider "template-index.html" "#main-slider" []
    ["div.embed-container"] (ef/content "")
-  ["div.carousel-content"] (ef/content "")
-  ["div.carousel"] (ef/set-attr :id "main-carousel")
-  ["ol li"] (ef/set-attr :data-target "#main-carousel")
-  ["a.hidden-xs"] (ef/set-attr :href "#main-carousel"))
+   ["div.carousel-content"] (ef/content "")
+   ["div.carousel"] (ef/set-attr :id "main-carousel")
+   ["ol li"] (ef/set-attr :data-target "#main-carousel")
+   ["a.hidden-xs"] (ef/set-attr :href "#main-carousel"))
 
 ;; http://www.plugolabs.com/twitter-bootstrap-button-generator-3/
 
@@ -328,6 +328,13 @@
      [:script {:type "text/javascript"} (str " $('#" name "').wysihtml5({locale: \"ru-RU\"});") ]
         ;;[:script {:type "text/javascript"} (str " $('#" name "').wysihtml5({locale: \"ru-RU\", toolbar: { fa: " true "}});") ]
       ])
+    ;;(.on (.find (.contents ($ ".wysihtml5-sandbox")) "body")
+    ;;   "keydown"
+    ;;   #(log "__  FROM_WYSIHTML5_EDITOR __ KEYPRESSED " (.-keyCode %)))
+
+  ;;(log "(.find (.contents ($ '.wysihtml5-sandbox')) 'body') is")
+   ;; (.dir js/console (.contents ($ '.wysihtml5-sandbox')))
+   ;;(.dir js/console (.find (.contents ($ '.wysihtml5-sandbox')) 'body'))
   ;;(.wysihtml5 ($ ".wysihtml5" ) (js-obj "locale" "ru-RU" "toolbar" (js-obj "fa" true)))
   ))
 
@@ -379,7 +386,7 @@
     ))
 
 
-(em/defaction slide-changed []
+(defn- slide-changed []
   (log "_______LISTENER SLIDE CHANGED!!!____________")
   (save-all-to-gameplay-atom)
   (render-dots)
@@ -387,6 +394,15 @@
   (when (all-question-filled?) (show-finish-button))
   )
 
+(em/defaction show-next-question []
+  (log "_______show-next-question________")
+  (.carousel ($ "#question-carousel") "next")
+  )
+
+(em/defaction show-previous-question []
+  (log "_______show-previous-question____________")
+  (.carousel ($ "#question-carousel") "prev")
+  )
 
 ;; проверяет количество элементов в атоме ответов. Если оно совпадает с количеств
 ;;ом вопросов то показывает кнопку ГОТОВО
@@ -472,12 +488,16 @@
 (em/defsnippet answer-slider2 "template-index.html" "#main-slider" [name title-question questionmap map-answer-atoms]
    ["div.embed-container"] (ef/content "")
    ["div.carousel"] (ef/do->
-                                          (ef/set-attr :id "question-carousel")
-                                          (ef/remove-class "wet-asphalt"))
+                     (ef/set-attr :id "question-carousel")
+                     (ef/remove-class "wet-asphalt")
+                     )
 
  ;; ["div.carousel-content"] (ef/content "")
   ["ol.carousel-indicators"] (ef/content (map slide-indicator (keys questionmap)))
-  ["a.hidden-xs"] (ef/set-attr :href "#question-carousel")
+  ["a.prev, a.next"] (ef/do->
+                   (ef/add-class "question-nav")
+                   (ef/remove-class "hidden-xs")
+                   (ef/set-attr :href "#question-carousel"))
   [".carousel li"] (ef/set-style :border "1px solid #34495e")
   [".carousel li.active"]  (ef/set-style :background-color "#34495e")
   ["div.carousel-inner"] (ef/do->
@@ -509,7 +529,13 @@
 
 (defn- setup-slide-listener []
   (log "_setup_slide_listener")
-  (.on ($ "#question-carousel") "slid.bs.carousel" #(slide-changed)))
+  (.on ($ "#question-carousel") "slid.bs.carousel" #(slide-changed))
+  ;;
+  ;; $('.wysihtml5-sandbox').contents().find('body').on("keydown",function() {
+  ;;      console.log("Handler for .keypress() called.");
+  ;;  });
+
+)
 
 (em/defaction answer-changed [ev]
   (log "INVOKED EVENT ANSWER CHANGED! EVENT IS " ev))
@@ -518,7 +544,9 @@
 (em/defaction setup-answer-change-listener []
   [".answer-0"] (events/listen :change #(answer-changed %))
   [".answer-1"] (events/listen :change #(answer-changed %))
-[".answer-2"] (events/listen :change #(answer-changed %)))
+[".answer-2"] (events/listen :change #(answer-changed %))
+  ["#question-carousel"] (events/listen :keydown
+                    #(log "__  events/listen-live __ KEYPRESSED " (.-keyCode %))))
 
 
 (defn create-vecmaps [number qkname questionmap]
@@ -574,16 +602,16 @@
            (ef/do-> (ef/content (site-header-questions))
                     (ef/append (site-page-title name ""))
                     (ef/append (answer-slider2 name title-question questionmap map-answer-atoms))))
-(setup-slide-listener)
-(setup-answer-change-listener)
-(log "before init-gameplay-metainfo vecmaps = " (map #(create-vecmaps % name questionmap) (keys questionmap)))
-(init-gameplay-metainfo questionmap name)
+    (setup-slide-listener)
+    (setup-answer-change-listener)
+    (log "before init-gameplay-metainfo vecmaps = " (map #(create-vecmaps % name questionmap) (keys questionmap)))
+    (init-gameplay-metainfo questionmap name)
 ;;(bind-mapansweratoms-with-gameplaydata map-answer-atoms)
-(.carousel ($ "#question-carousel") "pause")
+    (.carousel ($ "#question-carousel") "pause")
 
 ;; TODO DOES NOT CATCH KEY EVENTS
-(events/listen-live :keydown "#question-carousel"
-                    #(log "__KEYPRESSED " (.-keyCode %)))
+    (events/listen-live :keydown "#question-carousel"
+                    #(log "__  events/listen-live __ KEYPRESSED " (.-keyCode %)))
 ;; (ef/at ".breadcrumb" (ef/content (ef/html
 ;;                                              [:div ;;{:align "center"}
 ;;                                              [:a
@@ -661,6 +689,48 @@
       (render-questionkit-list @questionkit-list)
       (try-load-questionkits))
     (show-index))
+    (ef/at ".container1"
+           (ef/do-> (ef/append "
+<!-- Yandex.Metrika counter -->
+<script type=\"text/javascript\">
+(function (d, w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter25841003 = new Ya.Metrika({id:25841003,
+                    webvisor:true,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true,
+                    ut:\"noindex\"});
+        } catch(e) { }
+    });
+
+    var n = d.getElementsByTagName(\"script\")[0],
+        s = d.createElement(\"script\"),
+        f = function () { n.parentNode.insertBefore(s, n); };
+    s.type = \"text/javascript\";
+    s.async = true;
+    s.src = (d.location.protocol == \"https:\" ? \"https:\" : \"http:\") + \"//mc.yandex.ru/metrika/watch.js\";
+
+    if (w.opera == \"[object Opera]\") {
+        d.addEventListener(\"DOMContentLoaded\", f, false);
+    } else { f(); }
+})(document, window, \"yandex_metrika_callbacks\");
+</script>
+<noscript><div><img src=\"//mc.yandex.ru/watch/25841003?ut=noindex\" style=\"position:absolute; left:-9999px;\" alt=\"\" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+")
+(ef/append " <script>
+  (function(i,s,o,g,r,a,m){i[\"GoogleAnalyticsObject\"]=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,\"script\",\"//www.google-analytics.com/analytics.js\",\"ga\");
+
+  ga(\"create\", \"UA-51159702-3\", \"auto\");
+  ga(\"send\", \"pageview\");
+</script>
+"
+)))
   ;;(setup-listen)
   )
 

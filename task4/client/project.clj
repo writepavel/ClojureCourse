@@ -1,4 +1,5 @@
 (defproject client "0.1.0-SNAPSHOT"
+
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2202"]
                  [enfocus "2.1.0-SNAPSHOT"] ;; Dommy loads automatically  [prismatic/dommy "0.1.2"]

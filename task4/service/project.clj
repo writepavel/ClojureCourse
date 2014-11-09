@@ -9,7 +9,7 @@
                   [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                   [korma "0.3.1"]
                   [hiccup "1.0.5"]
-                  [clj-tagsoup "0.3.0"]
+                  [clj-tagsoup "0.3.0" :exclusions [org.clojure/clojure]]
                   [clj-http "0.9.2"] ;; Чтобы делать самостоятельные запросы в evernote.
                   ;;[http-kit "2.1.16"]
                   ;;[ring/ring-devel "1.3.0-RC1"]
@@ -19,5 +19,5 @@
                   [clojurenote "0.4.0"]]
    :plugins [[lein-ring "0.8.10"]]
    :ring {:handler service.core/app} ;; Переехал на http-kit чтобы делать самостоятельные запросы в evernote
-  ;; :main service.core
+   :main service.core
    :resource-paths ["resources" "../client/resources"])
