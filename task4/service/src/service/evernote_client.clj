@@ -70,7 +70,7 @@
     :key (get env "thinkhabit_key")
     :secret (env "thinkhabit_secret")
     :callback (str "http://" (get env "thinkhabit_host") "/evernote-oauth-callback")
-    ; Delete this, or set to false, to run vs production Evernote server
+    ; Delete this, or set to false, to run on production Evernote server
    :use-sandbox false
    })
 

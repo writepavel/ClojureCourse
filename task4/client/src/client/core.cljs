@@ -67,7 +67,7 @@
                                                [:div {:align "center" :style "vertical-align:bottom;"}
                                                  [:a.btn.btn-default.btn-danger.btn-lg
                                                  {:href "#" :onclick "client.core.login_by_evernote()"}
-                                                 "Войти    "
+                                                 "Войти     "  
                                                  [:span.glyphicon.glyphicon-log-in]]]))
 
   ["#gift-block .media-heading"] (ef/content "У меня ещё нет Evernote и хочу подарок")
