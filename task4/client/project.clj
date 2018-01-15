@@ -6,6 +6,7 @@
                  [enfocus "2.1.1"] ;; Dommy loads automatically  [prismatic/dommy "0.1.2"]
                  [prismatic/dommy "0.1.2"]
                  [jayq "2.5.1"]
+                 [tongue "0.2.3"]
              ;;    [hickory "0.5.3"] ;; for parsing evernote notes
                  [shoreleave/shoreleave-browser "0.3.0"]
                  [cljs-ajax "0.2.3"]]

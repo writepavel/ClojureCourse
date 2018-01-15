@@ -8,6 +8,7 @@
                 [client.questionkit :as qk]
                 [jayq.core :as jq]
                 [clojure.browser.repl :as repl]
+                [client.dicts :as dicts]
                 [client.helpers :refer [ log error-handler]])
   (:use [jayq.core :only [$]])
   (:require-macros [enfocus.macros :as em]))
@@ -16,6 +17,12 @@
 ;; (enable-console-print!)
 ;; (log "repl connect. Repl = " repl)
 (def questionkit-list (atom []))
+
+;; TODO make "change language" button
+(def locale (atom :en))
+
+(defn lang [key & args]
+  (dicts/translate @locale key args))
 
 ;; (em/defaction change [msg]
 ;;   ["#button1"] (ef/content msg))
@@ -32,10 +39,10 @@
 
 (em/defsnippet site-header "template-index.html" "header" []
   ["ul.nav"] (ef/do-> (ef/content "")
-                                (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.login_by_evernote()"} "Войти через свой Evernote "]]))
+                                (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.login_by_evernote()"} (lang :enter-button)]]))
                                 (ef/append (ef/html [:li [:a {:href  "#" :id "button1"
                                                               :onclick "client.core.evernote_gift()"
-                                                              } "У меня ещё нет Evernote и хочу подарок"]]))
+                                                              } (lang :register-button)]]))
                                 )
     ["a.navbar-brand"] (ef/do->;; (ef/content "")
                      (ef/remove-attr :href)
@@ -62,22 +69,22 @@
   ;; [".col-md-6"] (ef/add-class "col-sm-height")
   ;; [".col-md-6"] (ef/add-class "col-bottom")
 
-  ["#signin-block .media-heading"] (ef/content  "Войти через свой аккаунт Evernote" )
+  ["#signin-block .media-heading"] (ef/content (lang :enter-button))
 
   ["#signin-block .media-body p"] (ef/content (ef/html
                                                [:div {:align "center" :style "vertical-align:bottom;"}
                                                  [:a.btn.btn-default.btn-danger.btn-lg
                                                  {:href "#" :onclick "client.core.login_by_evernote()"}
-                                                 "Войти     "  
+                                                 (lang :enter)  
                                                  [:span.glyphicon.glyphicon-log-in]]]))
 
-  ["#gift-block .media-heading"] (ef/content "У меня ещё нет Evernote и хочу подарок")
+  ["#gift-block .media-heading"] (ef/content (lang :register-button))
 
   ["#gift-block .media-body p"] (ef/content (ef/html
                                              [:div {:align "center"}
                                              [:a.btn.btn-default.btn-danger.btn-lg
                                                {:href "#" :onclick "client.core.evernote_gift()" }
-                                               "Регистрация    "
+                                               (lang :registration)
                                                [:span.glyphicon.glyphicon-gift]]])))
 
 (em/defsnippet site-recentworks "template-index.html" "#bottom" []
@@ -86,7 +93,7 @@
 (em/defsnippet site-footer "template-index.html" "#footer" []
   ["footer"] (ef/content ""))
 
-(em/defsnippet site-page-title "about-us.html" "#title" [title subtitle]
+(em/defsnippet site-page-title (lang :template-page-name) "#title" [title subtitle]
   ["h1"] (ef/content
           (ef/html [:br])
                      "\n\n"  title "\n\n"
@@ -114,7 +121,7 @@
  ;; (site-header)
   ["ul.nav"] (ef/do-> (ef/content "")
                              ;;   (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.show_questionkits()"} "Вернуться к вопросам"]]))
-                                (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.logout()"} "Выйти"]]))
+                                (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.logout()"} (lang :logout)]]))
                                 ;; (ef/append (ef/html [:li [:a {:href "#" :onclick "client.core.evernote_gift()"} "У меня ещё нет Evernote и хочу подарок"]]))
                                  )
     ["a.navbar-brand"] (ef/do->;; (ef/content "")
@@ -134,12 +141,12 @@
 
 ;; notebean (:title :content :guid) -> qk (:name :answer-name :questions :note-guid)
 
-(em/defsnippet edit_questionkit "about-us.html" "#kit-editor" [{:keys [name answer-name questions]}]
+(em/defsnippet edit_questionkit (lang :template-page-name) "#kit-editor" [{:keys [name answer-name questions]}]
   "#name" (ef/set-attr :value name)
   "#answer-name" (ef/set-attr :value answer-name)
   "#kit-questions-area" (ef/set-attr :value questions))
 
-(em/defsnippet launcher "about-us.html" "#launcher" [qkdata]
+(em/defsnippet launcher (lang :template-page-name) "#launcher" [qkdata]
   ["button"] (ef/do-> (ef/content (:name qkdata))
                       (ef/set-attr :style "margin-bottom: 20px;")
                       ;; (ef/set-attr :onclick "client.core.edit_questionkit(" ((comp qk/html->qk qk/qk->formdata) (:content notebean)) ")")
@@ -173,7 +180,7 @@
       (ef/at "#questionkit-list" (ef/content (map launcher qklist)))
    ;;   (ef/at "#wait-message" (ef/content ""))
       )
-    (ef/at "#wait-message" (ef/content "У вас ещё нет комплекта вопросов. Создайте его, заполнив форму справа."))))
+    (ef/at "#wait-message" (ef/content (lang :still-empty-qk)))))
 
 (defn success-alert [data]
   (log "SUCCESS_ALERT. Data is cynced with server!"))
@@ -188,10 +195,10 @@
          :handler success-alert
         :error-handler error-handler})))
 
-(em/defsnippet questioneditor "about-us.html" "#kit-editor" []
+(em/defsnippet questioneditor (lang :template-page-name) "#kit-editor" []
   ["#new-kit-submit"] (ef/content "")
   ["#kit-questions-area"] (ef/set-attr :rows "7")
-  ["#new-kit-link"] (ef/content "Добавить новый")
+  ["#new-kit-link"] (ef/content (lang :add-new))
   ["#new-kit-link"] (ef/set-attr  :onclick "client.core.add_questionkit()")
 ;;  ["form"] (ef/set-attr :action "" :method "POST" :onsubmit "return client.core.try-add-questionkit()" )
   ;;["form"] (ef/remove-class "form-horizontal")
@@ -213,12 +220,12 @@
 
 ;; TODO where to put #wait-message content "" to save main message while (map launcher) works?
 
-(em/defsnippet site-questionkits "about-us.html" "#about-us" []
+(em/defsnippet site-questionkits (lang :template-page-name) "#about-us" []
   ["#team"] (ef/content "")
-  ["#left-side h2"] (ef/content "Выберите комплект")
-  ["#right-side h2"] (ef/content "Редактор")
+  ["#left-side h2"] (ef/content (lang :choose-kit))
+  ["#right-side h2"] (ef/content (lang :editor))
   ["#right-content"] (ef/content (questioneditor))
-  ["#left-content"] (ef/do-> (ef/content (ef/html [:div [:legend "подготовлено из заметок с тэгом  \"questionkit\""] [:h5#wait-message "Кнопки могут загружаться из Evernote в течение минуты"] [:div#questionkit-list]]))
+  ["#left-content"] (ef/do-> (ef/content (ef/html [:div [:legend (lang :prepared-with-qk-tag)] [:h5#wait-message (lang :buttons-slow-load)] [:div#questionkit-list]]))
                                         ;;    (ef/append (ef/html [:div#questionkit-list ]))
                              )
 ;;  ["#questionkit-list"] (ef/content (ef/html [:h3 "Если в вашем evernote есть уже комплекты вопросов, то они загрузятся сюда в течение минуты"]))
@@ -234,7 +241,7 @@
 (defn ^:export show-questionkits []
   (ef/at ".container1"
          (ef/do-> (ef/content (site-header-questions))
-                       (ef/append (site-page-title "Комплекты вопросов" ""))
+                       (ef/append (site-page-title (lang :question-kits) ""))
                        (ef/append (site-questionkits))
                        ;;(ef/append (site-footer))
                        )))
@@ -295,7 +302,7 @@
              [:div.col-md-3 ]
              [:div.col-md-6
                [:input.form-control.input-md.answer-0 {:autofocus "autofocus" :id "title-question" :name "title-question" :type "text" :placeholder title-question}]
-               [:span.help-block "заголовок всей серии ответов"]]
+               [:span.help-block (lang :title-of-answer-series)]]
              [:div.col-md-3]] ))
 
 
@@ -458,10 +465,10 @@
     (ef/append (if (= num 0) (question-title-editor question) (html-editor num)))
  ;;   (ef/append    (ef/html [:p (str "SLIDER! Value of "  num " is " question ", length is " length ", ATOM  IS " (pr-str @answer-atom))]))
    ;; (ef/append (progress-indicator))
-     (ef/append (ef/html [:div.answer-success {:hidden "hidden"} [:p "Отлично! Cохраните свои мысли в Evernote. Скоро вы выйдите на основной экран приложения." ]
+     (ef/append (ef/html [:div.answer-success {:hidden "hidden"} [:p (lang :to-main-page-soon) ]
                                               [:a.btn.btn-default.btn-success.btn-lg
                                                  {:style "color: #fff; border: 1px solid rgba(0, 0, 0, 0.3); border-radius: 4px; " :href "#" :onclick "client.core.try_send_answers()"}
-                                                 "Сохранить"
+                                                 (lang :save)
                                                ;;  [:span.glyphicon.glyphicon-log-in]
                                                ]])))
 [".answer-success .btn:hover"] (ef/set-style :background-color "#47a447")

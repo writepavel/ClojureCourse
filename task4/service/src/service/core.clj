@@ -174,28 +174,39 @@
 
 (defroutes compojure-handler
   (GET "/" [] (show-main-page))
+  
   (GET "/req" request (str request "\n \n host env = " (get env "thinkhabit_host") "\n\n session contents is " (session request)))
+  
   (GET "/app/state" [] (response @app-state))
   ;;  (
+  
    (GET "/questionkit-list" request (response-qklist (session request)))
+  
    (POST "/questionkit-list" {:keys [params cookies]}
          (try-update-questionkit (session-cookie cookies) (last (:note-map params)))
-
          (response-qklist (session-cookie cookies)))
+  
+   ;; (POST "/save-new-qks" {:keys [params cookies]}
+   ;;      (try-send-new-qks))
+  
    (POST "/answers" {:keys [params cookies]}
          (try-send-answers (session-cookie cookies) (:answers params))
          (response nil))
+  
    (POST "/app/state" {:keys [params]}
          (swap! app-state merge (:app-state params)))
    ;; (context "/app" app-routes)
    ;;  (context "/questionkit" [] questionkit-routes)
-   (context "/login" [] login-routes)
-   (GET "/evernote-oauth-callback" {:keys [params session cookies]}
+
+  (context "/login" [] login-routes)
+
+  (GET "/evernote-oauth-callback" {:keys [params session cookies]}
 ;;        (println "(GET /evernote-oauth-callback. params =  " params)
         (evernote-oauth-callback (session-cookie cookies) params session))
-   (route/resources "/")
-   (route/files "/" {:root (config :external-resources)})
-   (route/not-found "Not found!"))
+
+  (route/resources "/")
+  (route/files "/" {:root (config :external-resources)})
+  (route/not-found "Not found!"))
 
 (def app
   (-> compojure-handler

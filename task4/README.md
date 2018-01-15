@@ -1,5 +1,5 @@
 
-Sources of alpha version of http://thinkhabit.ru service
+Sources of alpha version of https://thinkhabit.ru service
 
 This servise is evernote client and is made for filling answers to regular questions made by the user himself.
 
