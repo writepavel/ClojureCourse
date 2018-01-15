@@ -35,6 +35,11 @@
 ;;(def evernote-login-status (atom false))
 
 
+;; (defn tec []
+;;   (pprint (last @en-sessions )))
+
+;; (tec)
+
 (defn show-main-page []
   (slurp (io/resource "public/index.html")))
 
@@ -44,8 +49,6 @@
 ;;----------------------------------------------------------------------------------------------
 
 
-;;(def host "http://localhost:3000")
-;; (def host "http://thinkhabit.ru")
 (def host (str "http://" (get env "thinkhabit_host")))
 
 (defn login-evernote
@@ -176,7 +179,7 @@
   ;;  (
    (GET "/questionkit-list" request (response-qklist (session request)))
    (POST "/questionkit-list" {:keys [params cookies]}
-         (try-update-questionkit (session-cookie cookies) (:note-map params))
+         (try-update-questionkit (session-cookie cookies) (last (:note-map params)))
 
          (response-qklist (session-cookie cookies)))
    (POST "/answers" {:keys [params cookies]}

@@ -9,12 +9,13 @@
                   [korma "0.4.3"]
                   [hiccup "1.0.5"]
                   [clj-tagsoup "0.3.0" :exclusions [org.clojure/clojure]]
-                  [clj-http "3.7.0"] ;; Чтобы делать самостоятельные запросы в evernote.
-                  ;;[http-kit "2.1.16"]
+                  [clj-http "3.7.0"] ;; for queries to evernote api
                   ;; [mysql/mysql-connector-java "5.1.30"]
                   [fogus/ring-edn "0.3.0"]
                   [clojurenote "0.4.0"]]
    :plugins [[lein-ring "0.12.3"]]
-   :ring {:handler service.core/app}
+   :ring {:handler service.core/app
+          :nrepl {:start? true
+                  :port 60000}}
    :main service.core
    :resource-paths ["resources" "../client/resources"])
