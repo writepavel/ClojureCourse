@@ -12,8 +12,9 @@
   (:use [jayq.core :only [$]])
   (:require-macros [enfocus.macros :as em]))
 
-;;(repl/connect "http://localhost:9000/repl")
-;;(log "repl connect. Repl = " repl)
+;; (repl/connect "http://localhost:9000/repl")
+;; (enable-console-print!)
+;; (log "repl connect. Repl = " repl)
 (def questionkit-list (atom []))
 
 ;; (em/defaction change [msg]
@@ -798,9 +799,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
 (defn ^:export evernote_gift []
-  (.open js/window "http://goo.gl/NZsMwD"))
+  ;; (.open js/window "http://goo.gl/NZsMwD")
+(.open js/window "https://www.evernote.com/Registration.action"))
 
 (defn ^:export login_by_evernote []
   (set! (.-pathname js/window.location) "/login/evernote"))
@@ -820,11 +821,14 @@
   ;;(reset! evernote-login-status status)
   )
 
+(defn- gather-data-to-save []
+  {:answers @gameplay-data})
+
 (defn- try-send-answers []
-    (POST "/answers"
-        {:params {:answers @gameplay-data}
-          :handler success-send-answers
-          :error-handler error-handler}))
+  (POST "/answers"
+        {:params (gather-data-to-save)
+        :handler success-send-answers
+        :error-handler error-handler}))
 
 
  (defn start []

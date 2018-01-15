@@ -25,3 +25,7 @@
 
 
 (def env (into {} (System/getenv)))
+
+(defn log [message & strs]
+  (when true (println (str message strs))))
+
